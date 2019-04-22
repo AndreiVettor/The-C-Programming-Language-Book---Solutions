@@ -1,42 +1,92 @@
 /*
  *  Chapter 5, Exercise 12
- *  Title: Entab
+ *  Title: Entab with arguments
  *  Author: Andrei Vettor
 */
 
 #include <stdio.h>
-#include <math.h>
-
+#include <stdlib.h>
 
 #define MAXLEN 1000
 #define DEFAULT_TAB_OFFSET 0
 #define DEFAULT_TAB_LENGTH 8
 
+#define START_INDEX tablen + tabofs
+#define END_INDEX n - (n - tabofs) % tablen
 
-int get_line(char*, int);
-void initialize(int, char**);
+
+int getln(char s[], int maxlines);
+void convargs(int argc, char* argv[]);
 void entab();
 
 
-char input[MAXLEN];
+char line[MAXLEN];
+char result[MAXLEN];
 int n;
-int tabofs;
-int tablen;
-
+int tabofs = 0;
+int tablen = 8;
 
 int main(int argc, char* argv[])
 {
-    initialize(argc, argv);
-    n = get_line(input, MAXLEN);
+    int i;
+    int j;
+    int index;
+    char space;
+    
+    int resindex = 0;
 
-    entab();
+    convargs(argc, argv);
+    n = getln(line, MAXLEN) - 1;
 
-    printf("%s", input);
+    // Handle / Copy characters before upset
+    for(i = 0; i < tabofs; ++i)
+    {
+        result[resindex++] = line[i];
+    }
+
+    for(i = START_INDEX; i <= END_INDEX; i += tablen)
+    {
+        // Reset spaces flag
+        space = 0;
+
+        for(j = i; j > i - tablen; --j)
+        {
+            if(line[j] == ' ')
+            {
+                space = 1;
+            }
+            else
+            {
+                // Copy the characters up to the space
+                index = j + space;
+                for(j = i - tablen; j < index; ++j)
+                {
+                    result[resindex++] = line[j];
+                }
+
+                // If any spaces were present add a tab character
+                if(space)
+                {
+                    result[resindex++] = '\t';
+                }
+
+                break;
+            }
+        }
+    }
+
+    for(i = END_INDEX; i < n; ++i)
+    {
+        result[resindex++] = line[i];
+    }
+    result[resindex] = '\0';
+
+    printf("%s", result);
 
     return 0;
 }
 
-int get_line(char s[], int maxlines)
+int getln(char s[], int maxlines)
 {
     char c;
     int i = 0;
@@ -56,7 +106,7 @@ int get_line(char s[], int maxlines)
     return i;
 }
 
-void initialize(int argc, char* argv[])
+void convargs(int argc, char* argv[])
 {
     int i;
 
@@ -69,7 +119,7 @@ void initialize(int argc, char* argv[])
         {
             case '-':
             {
-                tabofs = abs(atoi(argv[i]));
+                tabofs = -atoi(argv[i]);
                 break;
             }
             case '+':
@@ -84,23 +134,3 @@ void initialize(int argc, char* argv[])
         }
     }
 }
-
-void entab() 
-{
-    int i;
-    int result[MAXLEN];
-
-    for(i = tablen + tabofs; i < n - tablen; i += tablen)
-    {
-        if(i != ' ')
-        {
-            
-        }
-    }
-}
-
-// This is one of the tests
-//        ^
-
-// Makelhausendorf hah
-//        ^
