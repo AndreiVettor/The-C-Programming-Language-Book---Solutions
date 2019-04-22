@@ -1,7 +1,8 @@
 /*
  *  Chapter 5, Exercise 12
- *  Title: Entab with arguments
+ *  Title: entab
  *  Author: Andrei Vettor
+ *  Description: Entab with tab offset and tab length arguments
 */
 
 #include <stdio.h>
@@ -23,23 +24,22 @@ void entab();
 char line[MAXLEN];
 char result[MAXLEN];
 int n;
-int tabofs = 0;
-int tablen = 8;
+int tablen;
+int tabofs;
 
 int main(int argc, char* argv[])
 {
-    int i;
-    int j;
-    int index;
-    char space;
+    int i, j;
+    int spindex; // index at which first space up to tab is found
+    int resindex;
     
-    int resindex = 0;
+    char space;
 
     convargs(argc, argv);
     n = getln(line, MAXLEN) - 1;
 
-    // Handle / Copy characters before upset
-    for(i = 0; i < tabofs; ++i)
+    // Handle / Copy characters before offset
+    for(i = 0, resindex = 0; i < tabofs; ++i)
     {
         result[resindex++] = line[i];
     }
@@ -58,8 +58,8 @@ int main(int argc, char* argv[])
             else
             {
                 // Copy the characters up to the space
-                index = j + space;
-                for(j = i - tablen; j < index; ++j)
+                spindex = j + space;
+                for(j = i - tablen; j < spindex; ++j)
                 {
                     result[resindex++] = line[j];
                 }
@@ -75,6 +75,8 @@ int main(int argc, char* argv[])
         }
     }
 
+    // Copy any remaining trailing characters
+    // that did not fit into a tab column
     for(i = END_INDEX; i < n; ++i)
     {
         result[resindex++] = line[i];
