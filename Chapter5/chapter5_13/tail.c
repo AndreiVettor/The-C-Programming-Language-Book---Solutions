@@ -1,5 +1,5 @@
 /*
- *  Chapter 5, Exercise 12
+ *  Chapter 5, Exercise 13
  *  Title: Tail
  *  Author: Andrei Vettor
  * 
@@ -19,11 +19,11 @@ static char *allocp = allocbuf;
 char *lineptr[MAXLINES];
 int n;
 
-void convargs(int, char *[]);
-int getln(char[], int);
-int readlines(char *[], int);
-void writelines(char *[], int);
-char *alloc(int);
+void convargs(int argc, char *argv[]);
+int getln(char s[], int maxlen);
+int readlines(char *lineptr[], int maxlines);
+void writelines(char *lineptr[], int nlines);
+char *alloc(int n);
 
 int main(int argc, char* argv[])
 {
@@ -46,6 +46,11 @@ void convargs(int argc, char *argv[])
             case '-':
             {
                 n = -atoi(argv[i]);
+                if(n > MAXLINES)
+                {
+                    printf("Number of lines exceeds 5000, exiting...");
+                    return;
+                }
                 break;
             }
             default:
