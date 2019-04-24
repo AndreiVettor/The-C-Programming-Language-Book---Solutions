@@ -31,9 +31,9 @@ int numcmp(char *, char *);
 void convargs(int argc, char* argv[]);
 char *alloc(int n);
 
+int nlines;
 int main(int argc, char* argv[])
 {
-    int nlines;
 
     convargs(argc, argv);
     if((nlines = readlines(lineptr, MAXLINES)) >= 0)
@@ -67,32 +67,36 @@ int main(int argc, char* argv[])
 void qsort(void *v[], int left, int right,
     int (*comp)(void*, void*))
 {
-    int i, pivot;
+    int i, last;
 
     if(left >= right)
     {
         return;
     }
 
-    swap(v, left, (left + right) / 2);
+    // Move pivot element from middle to left
+    swap(v, right, (left + right) / 2);
 
-    pivot = left;
-    for(i = left + 1; i <= right; ++i)
+    // Set the first workable index to left
+    last = right;
+
+    // Partition elements lower than the pivot to the left
+    for(i = right - 1; i >= left; --i)
     {
-        if((*comp)(v[i], v[left]) < 0)
+        if((*comp)(v[i], v[right]) < 0)
         {
-            swap(v, ++left, i);
+            swap(v, --last, i);
         }
     }
-    swap(v, left, pivot);
-    qsort(v, left, pivot - 1, comp);
-    qsort(v, pivot + 1, right, comp);
+    swap(v, right, last);
+    qsort(v, left, last - 1, comp);
+    qsort(v, last + 1, right, comp);
 }
 
 void qsort_r(void *v[], int left, int right,
     int (*comp)(void*, void*))
 {
-    int i, pivot;
+    int i, last;
 
     if(left >= right)
     {
@@ -101,17 +105,17 @@ void qsort_r(void *v[], int left, int right,
 
     swap(v, left, (left + right) / 2);
 
-    pivot = left;
+    last = left;
     for(i = left + 1; i <= right; ++i)
     {
         if((*comp)(v[i], v[left]) > 0)
         {
-            swap(v, ++left, i);
+            swap(v, ++last, i);
         }
     }
-    swap(v, left, pivot);
-    qsort(v, left, pivot - 1, comp);
-    qsort(v, pivot + 1, right, comp);
+    swap(v, left, last);
+    qsort(v, left, last - 1, comp);
+    qsort(v, last + 1, right, comp);
 }
 
 void swap(void *v[], int i, int j)
