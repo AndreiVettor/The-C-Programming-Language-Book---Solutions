@@ -4,12 +4,14 @@
  *  Author: Andrei Vettor
  * 
  *  Description: Sorts lines in lexicographic or numeric order
- *      with the -n flag and in reverse with the -r flag
+ *      with the -n flag and in reverse with the -r flag, also
+ *      fold uppercase and lowercase with -f
 */
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 
 #define MAXLEN 1000
 #define MAXLINES 5000
@@ -24,10 +26,12 @@ int folding;
 int nlines;
 
 int readlines(char *v[], int nlines);
+int getln(char s[], int maxlen);
 void writelines(char *lineptr[], int nlines);
 void quicksort(void *lineptr[], int left, int right,
     int (*comp)(void *, void *));
 void swap(void *v[], int i, int j);
+int strcmpl(char *s1, char *s2);
 int numcmp(char *, char *);
 void convargs(int argc, char* argv[]);
 char *alloc(int n);
@@ -40,7 +44,8 @@ int main(int argc, char* argv[])
     {
         quicksort((void**) lineptr, 0, nlines - 1,
             numeric ? (int (*)(void*, void*))numcmp 
-            : (int (*)(void*, void*))strcmp);
+            : (folding ? (int (*)(void*, void*))strcmpl
+                : (int (*)(void*, void*))strcmp));
         
         writelines(lineptr, nlines);
         return 0;
@@ -110,6 +115,19 @@ int numcmp(char *s1, char *s2)
     }
 }
 
+int strcmpl(char *s1, char *s2)
+{
+    while(tolower(*s1++) == tolower(*s2++))
+    {
+        if(*s1 == '\0')
+        {
+            return 0;
+        }
+    }
+
+    return tolower(*--s1) - tolower(*--s2);
+}
+
 void convargs(int argc, char* argv[]) 
 {
     int i;
@@ -127,6 +145,11 @@ void convargs(int argc, char* argv[])
                 // Contains -n flag
                 if(strchr(argv[i], 'n') != NULL)
                 {
+                    if(folding == 1)
+                    {
+                        folding = 0;
+                        printf("Ignoring folding (-f) because of numeric ordering (-n)\n");
+                    }
                     numeric = 1;
                     printf("Ordering in numeric order. (-n)\n");
                 }
@@ -134,6 +157,18 @@ void convargs(int argc, char* argv[])
                 {
                     printf("Ordering in reverse. (-r)\n");
                     reverse = 1;
+                }
+                if(strchr(argv[i], 'f') != NULL)
+                {
+                    if(numeric == 1)
+                    {
+                        printf("Ignoring folding (-f) because of numeric ordering (-n)\n");
+                    }
+                    else
+                    {
+                        printf("Folding uppercase and lowercase (-f)\n");
+                        folding = 1;
+                    }
                 }
             }
         }
