@@ -31,7 +31,7 @@
 # Debug files
 *.dSYM/
 
-# Others
+# VS Code files
+*.json
 *.bin
 *.ipch
-*.json
