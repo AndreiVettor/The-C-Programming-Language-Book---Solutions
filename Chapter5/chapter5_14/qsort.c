@@ -8,6 +8,7 @@
 */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #define MAXLEN 1000
@@ -19,10 +20,11 @@ static char *allocp = allocbuf;
 char *lineptr[MAXLINES];
 int numeric;
 int reverse;
+int nlines;
 
 int readlines(char *v[], int nlines);
 void writelines(char *lineptr[], int nlines);
-void qsort(void *lineptr[], int left, int right,
+void qsort_f(void *lineptr[], int left, int right,
     int (*comp)(void *, void *));
 void qsort_r(void *v[], int left, int right,
     int (*comp)(void*, void*));
@@ -31,11 +33,10 @@ int numcmp(char *, char *);
 void convargs(int argc, char* argv[]);
 char *alloc(int n);
 
-int nlines;
 int main(int argc, char* argv[])
 {
-
     convargs(argc, argv);
+
     if((nlines = readlines(lineptr, MAXLINES)) >= 0)
     {
         if(reverse)
@@ -46,7 +47,7 @@ int main(int argc, char* argv[])
         }
         else
         {
-            qsort((void**) lineptr, 0, nlines - 1,
+            qsort_f((void**) lineptr, 0, nlines - 1,
                 numeric ? (int (*)(void*, void*))numcmp 
                 : (int (*)(void*, void*))strcmp);
         }
@@ -59,12 +60,11 @@ int main(int argc, char* argv[])
         printf("Input too big to sort\n");
         return 1;
     }
-    
 
     return 0;
 }
 
-void qsort(void *v[], int left, int right,
+void qsort_f(void *v[], int left, int right,
     int (*comp)(void*, void*))
 {
     int i, last;
@@ -74,23 +74,19 @@ void qsort(void *v[], int left, int right,
         return;
     }
 
-    // Move pivot element from middle to left
-    swap(v, right, (left + right) / 2);
+    swap(v, left, (left + right) / 2);
 
-    // Set the first workable index to left
-    last = right;
-
-    // Partition elements lower than the pivot to the left
-    for(i = right - 1; i >= left; --i)
+    last = left;
+    for(i = left + 1; i <= right; ++i)
     {
-        if((*comp)(v[i], v[right]) < 0)
+        if((*comp)(v[i], v[left]) < 0)
         {
-            swap(v, --last, i);
+            swap(v, ++last, i);
         }
     }
-    swap(v, right, last);
-    qsort(v, left, last - 1, comp);
-    qsort(v, last + 1, right, comp);
+    swap(v, left, last);
+    qsort_f(v, left, last - 1, comp);
+    qsort_f(v, last + 1, right, comp);
 }
 
 void qsort_r(void *v[], int left, int right,
@@ -114,8 +110,8 @@ void qsort_r(void *v[], int left, int right,
         }
     }
     swap(v, left, last);
-    qsort(v, left, last - 1, comp);
-    qsort(v, last + 1, right, comp);
+    qsort_r(v, left, last - 1, comp);
+    qsort_r(v, last + 1, right, comp);
 }
 
 void swap(void *v[], int i, int j)
@@ -133,6 +129,7 @@ int numcmp(char *s1, char *s2)
 
     v1 = atof(s1);
     v2 = atof(s2);
+
     if(v1 < v2)
     {
         return -1;
