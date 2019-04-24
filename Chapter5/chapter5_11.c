@@ -96,7 +96,7 @@ void entab(char input[], int tabc, int tablen[])
     strcpy(result, input);
 }
 
-int getline(char s[], int maxlen)
+int get_line(char s[], int maxlen)
 {
     int c, i = 0;
 
@@ -130,7 +130,7 @@ int main(int argc, char* argv[])
 {
     char text[MAXLEN];
 
-    getline(text, MAXLEN);
+    get_line(text, MAXLEN);
 
     int tablens[MAXTABS];
     convargs(argc, argv, tablens);
