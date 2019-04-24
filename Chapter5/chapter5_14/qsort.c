@@ -39,18 +39,9 @@ int main(int argc, char* argv[])
 
     if((nlines = readlines(lineptr, MAXLINES)) >= 0)
     {
-        if(reverse)
-        {
-            qsort_r((void**) lineptr, 0, nlines - 1,
-                numeric ? (int (*)(void*, void*))numcmp 
-                : (int (*)(void*, void*))strcmp);
-        }
-        else
-        {
-            qsort_f((void**) lineptr, 0, nlines - 1,
-                numeric ? (int (*)(void*, void*))numcmp 
-                : (int (*)(void*, void*))strcmp);
-        }
+        qsort((void**) lineptr, 0, nlines - 1,
+            numeric ? (int (*)(void*, void*))numcmp 
+            : (int (*)(void*, void*))strcmp);
         
         writelines(lineptr, nlines);
         return 0;
@@ -64,7 +55,7 @@ int main(int argc, char* argv[])
     return 0;
 }
 
-void qsort_f(void *v[], int left, int right,
+void qsort(void *v[], int left, int right,
     int (*comp)(void*, void*))
 {
     int i, last;
@@ -79,39 +70,15 @@ void qsort_f(void *v[], int left, int right,
     last = left;
     for(i = left + 1; i <= right; ++i)
     {
-        if((*comp)(v[i], v[left]) < 0)
+        if(reverse == 1 ? (*comp)(v[i], v[left]) < 0
+            : (*comp)(v[i], v[left]) > 0)
         {
             swap(v, ++last, i);
         }
     }
     swap(v, left, last);
-    qsort_f(v, left, last - 1, comp);
-    qsort_f(v, last + 1, right, comp);
-}
-
-void qsort_r(void *v[], int left, int right,
-    int (*comp)(void*, void*))
-{
-    int i, last;
-
-    if(left >= right)
-    {
-        return;
-    }
-
-    swap(v, left, (left + right) / 2);
-
-    last = left;
-    for(i = left + 1; i <= right; ++i)
-    {
-        if((*comp)(v[i], v[left]) > 0)
-        {
-            swap(v, ++last, i);
-        }
-    }
-    swap(v, left, last);
-    qsort_r(v, left, last - 1, comp);
-    qsort_r(v, last + 1, right, comp);
+    qsort(v, left, last - 1, comp);
+    qsort(v, last + 1, right, comp);
 }
 
 void swap(void *v[], int i, int j)
