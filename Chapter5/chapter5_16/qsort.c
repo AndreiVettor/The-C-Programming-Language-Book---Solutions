@@ -38,6 +38,7 @@ void quicksort(void *lineptr[], int left, int right,
     int (*comp)(void *, void *));
 void swap(void *v[], int i, int j);
 int strcmpfl(char *s1, char *s2);
+char* skipnonchar(char *s);
 int numcmp(char *, char *);
 void convargs(int argc, char* argv[]);
 char *alloc(int n);
@@ -123,35 +124,37 @@ int numcmp(char *s1, char *s2)
 
 int strcmpfl(char *s1, char *s2)
 {
-    printf("%s - %s\n", s1, s2);
-
-    while(folding ? tolower(*s1) == tolower(*s2) : *s1 == *s2)
+    if(directory)
     {
-        if(directory)
-        {
-            if(!isalnum(*s1) && !isspace(*s1))
-            {
-                *s1++;
-                continue;
-            }
-            else if(!isalnum(*s2) && !isspace(*s2))
-            {
-                *s2++;
-                continue;
-            }
-        }
+        s1 = skipnonchar(s1);
+        s2 = skipnonchar(s2);
+    }
 
+    while(folding ? (tolower(*s1) == tolower(*s2)) : (*s1 == *s2))
+    {
         if(*++s1 == '\0')
         {
             return 0;
         }
 
         *++s2;
+
+        if(directory)
+        {
+            s1 = skipnonchar(s1);
+            s2 = skipnonchar(s2);
+        }
     }
 
-    printf("result: %d\n", folding ? tolower(*(s1 - 1)) - tolower(*(s2-1)) : *(s1-1) - *(s2-1));
+    return folding ? (tolower(*s1) - tolower(*s2)) : (*s1 - *s2);
+}
 
-    return folding ? tolower(*--s1) - tolower(*--s2) : *--s1 - *--s2;
+char* skipnonchar(char *s)
+{
+    while(!isalnum(*s) && !isspace(*s))
+        *s++;
+
+    return s;
 }
 
 void convargs(int argc, char* argv[]) 
