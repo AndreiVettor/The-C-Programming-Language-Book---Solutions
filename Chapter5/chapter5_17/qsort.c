@@ -7,7 +7,8 @@
  *      with the -n flag and in reverse with the -r flag, also
  *      fold uppercase and lowercase with -f and directory order
  *      (only letters, numbers and spaces) (-d). This version
- *      also allows field handling
+ *      also allows field handling with (-l n) where n is the
+ *      field selected (eg. -l 2)
  * 
  *  I know this solution is rather messy but I didn't want to
  *      rearchitect the whole program because of extensions. I
